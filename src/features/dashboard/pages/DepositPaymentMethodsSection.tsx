@@ -1,0 +1,434 @@
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { paymentMethodApi, depositMethodLabel, type DepositPaymentMethod } from '../../../utils/api';
+import { useToast } from '../../../components/Toast';
+import { useConfirmDialog } from '../../../components/ConfirmDialog';
+import bkashLogo from '../../../assets/bikash-logo.png';
+import nagadLogo from '../../../assets/Nagad-Logo.png';
+import bkashPaymentImg from '../../../assets/bikashpayment.jpeg';
+import nagadPaymentImg from '../../../assets/nagadhpayment.jpeg';
+
+const fadeUp = {
+    hidden: { opacity: 0, y: 12 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.35 } },
+};
+
+const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: '0.6rem',
+    letterSpacing: '0.18em',
+    textTransform: 'uppercase',
+    color: 'var(--text-muted)',
+    fontWeight: 700,
+    fontFamily: "'Inter', sans-serif",
+    marginBottom: '6px',
+};
+
+const inputStyle: React.CSSProperties = {
+    width: '100%',
+    background: 'var(--bg-input)',
+    border: '1px solid var(--border-default)',
+    borderRadius: '8px',
+    padding: '11px 14px',
+    color: 'var(--text-primary)',
+    fontSize: '0.85rem',
+    fontFamily: "'Inter', sans-serif",
+    outline: 'none',
+    boxSizing: 'border-box',
+};
+
+const typeLabel = (t: string | null) => (!t ? 'Merchant' : t === 'agent' ? 'Agent' : 'Personal');
+const methodName = (m: string) => depositMethodLabel(m);
+
+function StoreIcon({ size = 30 }: { size?: number }) {
+    return (
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="#D4A72C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M3 9l1.5-5h15L21 9" />
+            <path d="M4 9v11a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9" />
+            <path d="M3 9a2.5 2.5 0 0 0 5 0a2.5 2.5 0 0 0 5 0a2.5 2.5 0 0 0 5 0" />
+            <path d="M9 21v-6h6v6" />
+        </svg>
+    );
+}
+
+function methodLogo(m: DepositPaymentMethod) {
+    if (m.method === 'bkash') return bkashLogo;
+    if (m.method === 'nagad') return nagadLogo;
+    if (m.method === 'merchant' && m.provider_name?.toLowerCase().includes('nagad')) return nagadPaymentImg;
+    if (m.method === 'merchant') return bkashPaymentImg;
+    return null;
+}
+
+function merchantPaymentImg(providerName: string) {
+    return providerName.toLowerCase().includes('nagad') ? nagadPaymentImg : bkashPaymentImg;
+}
+
+type FormMethod = 'bkash' | 'nagad' | 'merchant';
+
+export function DepositPaymentMethodsSection() {
+    const toast = useToast();
+    const confirmDialog = useConfirmDialog();
+
+    const [methods, setMethods] = useState<DepositPaymentMethod[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [busyId, setBusyId] = useState<number | null>(null);
+
+    const [showForm, setShowForm] = useState(false);
+    const [editing, setEditing] = useState<DepositPaymentMethod | null>(null);
+    const [formMethod, setFormMethod] = useState<FormMethod>('bkash');
+    const [formNumber, setFormNumber] = useState('');
+    const [formType, setFormType] = useState<'personal' | 'agent'>('personal');
+    const [formInstructions, setFormInstructions] = useState('');
+    const [formMerchantPlatform, setFormMerchantPlatform] = useState<'bkash' | 'nagad'>('bkash');
+    const [saving, setSaving] = useState(false);
+
+    const load = async () => {
+        const res = await paymentMethodApi.getAll();
+        if (!res.error && res.data) setMethods(res.data.methods);
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        let cancelled = false;
+        (async () => {
+            const res = await paymentMethodApi.getAll();
+            if (!cancelled && !res.error && res.data) setMethods(res.data.methods);
+            if (!cancelled) setLoading(false);
+        })();
+        return () => { cancelled = true; };
+    }, []);
+
+    const isMerchantForm = formMethod === 'merchant';
+
+    const openAdd = (m: FormMethod) => {
+        setEditing(null);
+        setFormMethod(m);
+        setFormNumber('');
+        setFormType('personal');
+        setFormInstructions('');
+        setFormMerchantPlatform('bkash');
+        setShowForm(true);
+    };
+
+    const openEdit = (m: DepositPaymentMethod) => {
+        setEditing(m);
+        setFormMethod(m.method);
+        setFormNumber(m.account_number);
+        if (m.account_type === 'agent' || m.account_type === 'personal') setFormType(m.account_type);
+        else setFormType('personal');
+        setFormInstructions(m.instructions || '');
+        const isNagad = (m.provider_name || '').toLowerCase().includes('nagad');
+        setFormMerchantPlatform(isNagad ? 'nagad' : 'bkash');
+        setShowForm(true);
+    };
+
+    const handleSave = async () => {
+        const num = formNumber.replace(/[\s-]/g, '');
+        let payload: Parameters<typeof paymentMethodApi.create>[0];
+
+        if (isMerchantForm) {
+            if (!/^\d{6,20}$/.test(num)) {
+                toast.error('Enter a valid merchant number (6–20 digits).');
+                return;
+            }
+            const platformLabel = formMerchantPlatform === 'nagad' ? 'Nagad' : 'bKash';
+            const providerName = `${platformLabel} Merchant`;
+            payload = {
+                method: 'merchant',
+                account_number: num,
+                provider_name: providerName,
+                instructions: formInstructions.trim(),
+                is_active: true,
+            };
+        } else {
+            if (!num || !/^01[3-9][0-9]{8}$/.test(num)) {
+                toast.error('Enter a valid Bangladesh mobile number (01XXXXXXXXX)');
+                return;
+            }
+            payload = {
+                method: formMethod,
+                account_number: num,
+                account_type: formType,
+                is_active: true,
+            };
+        }
+
+        setSaving(true);
+        const res = editing
+            ? await paymentMethodApi.update(editing.id, payload)
+            : await paymentMethodApi.create(payload);
+        setSaving(false);
+        if (res.error) {
+            toast.error(res.error);
+            return;
+        }
+        toast.success(editing ? 'Payment method updated.' : 'Payment method added.');
+        setShowForm(false);
+        await load();
+    };
+
+    const handleToggle = async (m: DepositPaymentMethod) => {
+        const activating = m.is_active !== 1;
+        if (!activating) {
+            const ok = await confirmDialog({
+                title: `Disable ${methodName(m.method)}${m.provider_name ? ` (${m.provider_name})` : ''}?`,
+                message: 'Users and providers will no longer see this payment method for deposits.',
+                confirmLabel: 'Disable',
+                variant: 'danger',
+            });
+            if (!ok) return;
+        }
+        setBusyId(m.id);
+        const res = await paymentMethodApi.toggle(m.id, activating);
+        setBusyId(null);
+        if (res.error) {
+            toast.error(res.error);
+            return;
+        }
+        toast.success(activating ? 'Payment method enabled.' : 'Payment method disabled.');
+        await load();
+    };
+
+    const handleDelete = async (m: DepositPaymentMethod) => {
+        const ok = await confirmDialog({
+            title: `Delete ${m.provider_name || 'merchant'}?`,
+            message: 'Merchants used by past deposits cannot be deleted — those records keep their history. This action cannot be undone.',
+            confirmLabel: 'Delete',
+            variant: 'danger',
+        });
+        if (!ok) return;
+        setBusyId(m.id);
+        const res = await paymentMethodApi.remove(m.id);
+        setBusyId(null);
+        if (res.error) {
+            toast.error(res.error);
+            return;
+        }
+        toast.success('Merchant removed.');
+        await load();
+    };
+
+    const logoSrc = (m: DepositPaymentMethod) => methodLogo(m);
+
+    return (
+        <>
+            <motion.div variants={fadeUp} initial="hidden" animate="show" className="card gold-top-edge" style={{ marginBottom: 'var(--space-6)', padding: 'var(--space-6)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', flexWrap: 'wrap', marginBottom: 'var(--space-4)' }}>
+                    <div style={{ minWidth: 0 }}>
+                        <h2 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
+                            Deposit Payment Methods
+                        </h2>
+                        <p style={{ margin: '4px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                            bKash / Nagad / Merchant numbers shown to users &amp; providers when depositing.
+                        </p>
+                    </div>
+                    <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', minWidth: 0, maxWidth: '100%' }}>
+                        <button className="btn btn-primary btn-sm" onClick={() => openAdd('bkash')}>+ Add bKash</button>
+                        <button className="btn btn-outline btn-sm" onClick={() => openAdd('nagad')}>+ Add Nagad</button>
+                        <button className="btn btn-outline btn-sm" onClick={() => openAdd('merchant')}>+ Add Merchant</button>
+                    </div>
+                </div>
+
+                {loading ? (
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', margin: 0 }}>Loading payment methods…</p>
+                ) : methods.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '28px 0', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                        No payment methods configured yet. Add a bKash, Nagad or Merchant account to show users where to send deposits.
+                    </div>
+                ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                        {methods.map((m) => {
+                            const active = m.is_active === 1;
+                            const busy = busyId === m.id;
+                            const src = logoSrc(m);
+                            return (
+                                <div key={m.id} style={{
+                                    display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)', flexWrap: 'wrap',
+                                    padding: '12px 14px', borderRadius: 'var(--radius-md)',
+                                    background: 'var(--bg-input)', border: '1px solid var(--border-subtle)',
+                                }}>
+                                    <div style={{ width: 36, height: 36, borderRadius: 8, overflow: 'hidden', background: 'var(--bg-input)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                        {src ? (
+                                            <img src={src} alt={methodName(m.method)} style={{ width: 30, height: 30, objectFit: 'contain' }} />
+                                        ) : (
+                                            <StoreIcon size={26} />
+                                        )}
+                                    </div>
+                                    <div style={{ flex: 1, minWidth: 140 }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                                            <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                                                {m.method === 'merchant' && m.provider_name ? m.provider_name : methodName(m.method)}
+                                            </span>
+                                            <span className="badge" style={m.method === 'merchant'
+                                                ? { background: 'rgba(212,167,44,0.12)', color: 'var(--gold-mid)', borderColor: 'rgba(212,167,44,0.35)' }
+                                                : { background: 'rgba(212,167,44,0.12)', color: '#818cf8', borderColor: 'rgba(212,167,44,0.3)' }}>
+                                                {typeLabel(m.account_type)}
+                                            </span>
+                                            <span className="badge" style={active
+                                                ? { background: 'rgba(16,185,129,0.12)', color: 'var(--green-status)', borderColor: 'rgba(16,185,129,0.35)' }
+                                                : { background: 'rgba(148,163,184,0.12)', color: 'var(--text-secondary)', borderColor: 'rgba(148,163,184,0.3)' }}>
+                                                {active ? 'Active' : 'Inactive'}
+                                            </span>
+                                        </div>
+                                        <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', marginTop: 3 }}>{m.account_number}</div>
+                                        {m.instructions ? (
+                                            <div style={{
+                                                fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4,
+                                                whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+                                                display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                                            }}>{m.instructions}</div>
+                                        ) : null}
+                                    </div>
+                                    <div style={{ display: 'flex', gap: 'var(--space-2)', flexShrink: 0 }}>
+                                        <button className="btn btn-ghost btn-sm" onClick={() => openEdit(m)} style={{ padding: '6px 12px' }}>Edit</button>
+                                        {active ? (
+                                            <button className="btn btn-ghost btn-sm" onClick={() => handleToggle(m)} disabled={busy || busyId !== null} style={{ padding: '6px 12px', color: '#D4A72C', borderColor: 'rgba(212,167,44,0.4)' }}>
+                                                {busy ? '…' : 'Disable'}
+                                            </button>
+                                        ) : (
+                                            <button className="btn btn-primary btn-sm" onClick={() => handleToggle(m)} disabled={busy || busyId !== null} style={{ padding: '6px 12px' }}>
+                                                {busy ? '…' : 'Enable'}
+                                            </button>
+                                        )}
+                                        {m.method === 'merchant' && (
+                                            <button className="btn btn-ghost btn-sm" onClick={() => handleDelete(m)} disabled={busy || busyId !== null} style={{ padding: '6px 12px', color: 'var(--red-status)', borderColor: 'rgba(239,68,68,0.4)' }}>
+                                                Delete
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </motion.div>
+
+            {/* Add / Edit form modal */}
+            {showForm && (
+                <div
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label={editing ? 'Edit payment method' : 'Add payment method'}
+                    onClick={() => { if (!saving) setShowForm(false); }}
+                    style={{
+                        position: 'fixed', inset: 0, zIndex: 800,
+                        background: 'var(--bg-overlay)', backdropFilter: 'blur(6px)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+                    }}
+                >
+                    <div
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                            width: '100%', maxWidth: 380, maxHeight: '90vh', overflowY: 'auto',
+                            background: 'var(--bg-card)',
+                            border: '1px solid var(--border-subtle)', borderRadius: 16,
+                            boxShadow: 'var(--shadow-lg)', boxSizing: 'border-box', padding: '22px 20px',
+                            fontFamily: "'Inter', sans-serif", animation: 'vserv-toast-in 0.18s ease',
+                        }}
+                    >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+                            <div style={{ width: 32, height: 32, borderRadius: 8, overflow: 'hidden', background: 'var(--bg-input)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                {isMerchantForm ? (
+                                    <img src={formMerchantPlatform === 'nagad' ? nagadLogo : bkashLogo} alt={formMerchantPlatform} style={{ width: 26, height: 26, objectFit: 'contain' }} />
+                                ) : (
+                                    (() => {
+                                        const src = logoSrc({ id: 0, method: formMethod } as DepositPaymentMethod);
+                                        return src ? (
+                                            <img src={src} alt={methodName(formMethod)} style={{ width: 26, height: 26, objectFit: 'contain' }} />
+                                        ) : <StoreIcon size={22} />;
+                                    })()
+                                )}
+                            </div>
+                            <p style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                                {editing ? 'Edit' : 'Add'} {isMerchantForm ? 'Merchant' : `${methodName(formMethod)} Account`}
+                            </p>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                            {isMerchantForm && (
+                                <div>
+                                    <label style={labelStyle}>Merchant platform *</label>
+                                    <select
+                                        style={{ ...inputStyle, cursor: 'pointer' }}
+                                        value={formMerchantPlatform}
+                                        onChange={(e) => setFormMerchantPlatform(e.target.value as 'bkash' | 'nagad')}
+                                    >
+                                        <option value="bkash">bKash Merchant</option>
+                                        <option value="nagad">Nagad Merchant</option>
+                                    </select>
+                                </div>
+                            )}
+
+                            <div>
+                                <label style={labelStyle}>{isMerchantForm ? 'Merchant number *' : 'Account number *'}</label>
+                                <input
+                                    style={inputStyle}
+                                    inputMode="numeric"
+                                    value={formNumber}
+                                    onChange={(e) => setFormNumber(
+                                        isMerchantForm
+                                            ? e.target.value.replace(/[^\d\s-]/g, '').slice(0, 24)
+                                            : e.target.value.replace(/\D/g, '').slice(0, 11)
+                                    )}
+                                    placeholder={isMerchantForm ? 'Merchant account number' : '01XXXXXXXXX'}
+                                />
+                            </div>
+
+                            {!isMerchantForm && (
+                                <div>
+                                    <label style={labelStyle}>Account type</label>
+                                    <select
+                                        style={{ ...inputStyle, cursor: 'pointer' }}
+                                        value={formType}
+                                        onChange={(e) => setFormType(e.target.value as 'personal' | 'agent')}
+                                    >
+                                        <option value="personal">Personal</option>
+                                        <option value="agent">Agent</option>
+                                    </select>
+                                </div>
+                            )}
+
+                            {isMerchantForm && (
+                                <>
+                                    <div>
+                                        <label style={labelStyle}>Payment instructions</label>
+                                        <textarea
+                                            style={{ ...inputStyle, minHeight: 90, resize: 'vertical' }}
+                                            value={formInstructions}
+                                            onChange={(e) => setFormInstructions(e.target.value.slice(0, 2000))}
+                                            placeholder="Optional — e.g. Send money as Personal, then submit the TrxID below."
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={labelStyle}>Instruction image</label>
+                                        <div style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid var(--border-subtle)' }}>
+                                            <img
+                                                src={merchantPaymentImg(formMerchantPlatform === 'nagad' ? 'Nagad' : 'bKash')}
+                                                alt={`${formMerchantPlatform === 'nagad' ? 'Nagad' : 'bKash'} payment instructions`}
+                                                style={{ width: '100%', maxHeight: 160, objectFit: 'contain', background: 'var(--bg-input)', display: 'block' }}
+                                            />
+                                        </div>
+                                        <div style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginTop: 6 }}>
+                                            Instruction image is set automatically based on the platform.
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+
+                            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', borderTop: '1px solid var(--border-subtle)', paddingTop: 14 }}>
+                                <button className="btn btn-ghost btn-sm" onClick={() => setShowForm(false)} disabled={saving}>
+                                    Cancel
+                                </button>
+                                <button className="btn btn-primary btn-sm" onClick={handleSave} disabled={saving}>
+                                    {saving ? 'Saving…' : 'Save'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
+    );
+}
+
+export default DepositPaymentMethodsSection;
