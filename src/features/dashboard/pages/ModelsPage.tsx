@@ -28,18 +28,23 @@ export function ModelsPage() {
             style={{ minHeight: '100%', background: 'var(--bg-main)', padding: '16px' }}
         >
             {/* Top Bar */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+            <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px',
+                background: 'var(--bg-nav)', padding: '10px 16px', borderRadius: '12px',
+                border: '1px solid var(--border-subtle)',
+            }}>
                 <span style={{
                     fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: '1.1rem', letterSpacing: '0.2em', color: 'var(--gold-mid)', fontWeight: 400,
+                    fontSize: '1.1rem', letterSpacing: '0.2em', color: 'var(--text-on-nav)', fontWeight: 600,
+                    display: 'inline-flex', alignItems: 'center', gap: 8,
                 }}>
-                    <img src={logo} alt="Travel Partner" style={{ height: 22, objectFit: 'contain', marginRight: 6 }} />
+                    <img src={logo} alt="Travel Partner" style={{ height: 26, objectFit: 'contain' }} />
                     Travel Partner
                 </span>
                 <span style={{
                     fontSize: '0.55rem', letterSpacing: '0.2em', textTransform: 'uppercase',
-                    color: 'var(--text-primary)', fontFamily: "'Inter', sans-serif", fontWeight: 700,
-                    background: 'var(--gold-glow)', border: '1px solid var(--border-subtle)',
+                    color: 'var(--text-on-nav)', fontFamily: "'Inter', sans-serif", fontWeight: 800,
+                    background: 'rgba(255, 255, 255, 0.28)', border: '1px solid rgba(14,31,58,0.12)',
                     padding: '4px 10px', borderRadius: '6px',
                 }}>
                     ◈ COMPANIONS

@@ -202,7 +202,7 @@ export function BottomNav() {
                                     background: 'transparent',
                                     border: 'none',
                                     cursor: 'pointer',
-                                    color: 'var(--text-secondary)',
+                                    color: 'var(--text-on-nav-muted)',
                                     transition: 'all 0.2s ease-in-out',
                                     fontSize: 'clamp(0.52rem, 1.8vw, 0.65rem)',
                                     letterSpacing: '0.06em',
@@ -214,7 +214,7 @@ export function BottomNav() {
                                 }}
                             >
                                 <span style={{
-                                    color: 'var(--text-secondary)',
+                                    color: 'var(--text-on-nav-muted)',
                                     display: 'flex',
                                     transform: 'scale(1)',
                                     transition: 'transform 0.2s ease',
@@ -248,7 +248,7 @@ export function BottomNav() {
                                 padding: '0 2px',
                                 gap: '4px',
                                 textDecoration: 'none',
-                                color: isActive ? 'var(--gold-mid)' : 'var(--text-secondary)',
+                                color: isActive ? 'var(--gold-mid)' : 'var(--text-on-nav-muted)',
                                 transition: 'all 0.2s ease-in-out',
                                 fontSize: 'clamp(0.52rem, 1.8vw, 0.65rem)',
                                 letterSpacing: '0.06em',
@@ -262,7 +262,7 @@ export function BottomNav() {
                             {({ isActive }) => (
                                 <>
                                     <span style={{
-                                        color: isActive ? 'var(--gold-mid)' : 'var(--text-secondary)',
+                                        color: isActive ? 'var(--gold-mid)' : 'var(--text-on-nav-muted)',
                                         display: 'flex',
                                         transform: isActive ? 'scale(1.1)' : 'scale(1)',
                                         transition: 'transform 0.2s ease',

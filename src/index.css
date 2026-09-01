@@ -32,6 +32,8 @@
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
   --color-text-gold: var(--text-gold);
+  --color-text-on-nav: var(--text-on-nav);
+  --color-text-on-nav-muted: var(--text-on-nav-muted);
 
   --color-border-subtle: var(--border-subtle);
   --color-border-default: var(--border-default);
@@ -48,7 +50,7 @@
      This is the hierarchy your old file didn't have. */
   --bg-root: #0A0F1A;
   --bg-main: #0A0F1A;
-  --bg-nav: #0D1420;
+  --bg-nav: #7a92b8;
   --bg-card: #111827;
   --bg-card-hover: #172032;
   --bg-input: #131B2B;
@@ -84,6 +86,10 @@
   --text-muted: #6B7385;
   /* decorative/meta only — not for body copy */
   --text-gold: var(--gold-mid);
+
+  /* --- Text ON nav bg (#7a92b8 is medium-blue → needs DARK text) --- */
+  --text-on-nav:       #000000;   /* primary labels, icons  */
+  --text-on-nav-muted: #000000;   /* secondary / inactive   */
 
   /* --- Borders & Dividers --- */
   --border-subtle: #1B2434;
@@ -513,6 +519,15 @@ button:focus-visible {
   border-color: var(--border-gold);
   box-shadow: var(--shadow-gold);
   transform: translateY(-2px);
+}
+
+.logo-bg-wrapper {
+  background-color: var(--bg-nav);
+  border-radius: var(--radius-md);
+  padding: 6px 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .divider-ornament {

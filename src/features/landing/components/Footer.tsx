@@ -35,12 +35,13 @@ export function Footer() {
 
     return (
         <footer style={{
-            position: 'relative', borderTop: '1px solid var(--border-default)',
-            background: 'var(--bg-root)', overflow: 'hidden',
+            position: 'relative', borderTop: '1px solid rgba(0, 0, 0, 0.12)',
+            background: 'var(--bg-nav)', overflow: 'hidden',
+            color: 'var(--text-on-nav)',
         }}>
             <div style={{
                 position: 'absolute', top: 0, left: '33%', right: '33%', height: '1px',
-                background: 'linear-gradient(90deg, transparent, var(--gold-border), transparent)',
+                background: 'linear-gradient(90deg, transparent, rgba(14,31,58,0.35), transparent)',
             }} />
 
             <div style={{ maxWidth: 1100, margin: '0 auto', padding: '64px 24px 32px' }}>
@@ -55,14 +56,14 @@ export function Footer() {
                             <img src={logo} alt="Travel Partner" style={{ height: 60, objectFit: 'contain' }} />
                         </div>
                         <div style={{
-                            fontSize: '0.6rem', letterSpacing: '0.22em', textTransform: 'uppercase',
-                            color: 'var(--gold-mid)', fontFamily: "var(--font-sans)", fontWeight: 600, marginBottom: '12px',
+                            fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase',
+                            color: 'var(--text-on-nav)', fontFamily: "var(--font-sans)", fontWeight: 700, marginBottom: '12px',
                         }}>
                             Connect. Experience. Belong.
                         </div>
                         <p style={{
-                            color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: 1.7,
-                            fontFamily: "var(--font-sans)", maxWidth: 300, margin: 0,
+                            color: 'var(--text-on-nav-muted)', fontSize: '0.85rem', lineHeight: 1.7,
+                            fontFamily: "var(--font-sans)", maxWidth: 300, margin: 0, fontWeight: 500,
                         }}>
                             Explore meaningful connections, engaging conversations, and
                             experiences through Travel Partner.
@@ -73,8 +74,8 @@ export function Footer() {
                     {columns.map(col => (
                         <div key={col.title}>
                             <h4 style={{
-                                fontFamily: "var(--font-sans)", fontSize: '0.62rem', letterSpacing: '0.2em',
-                                textTransform: 'uppercase', color: 'var(--gold-mid)', fontWeight: 700, margin: '0 0 18px',
+                                fontFamily: "var(--font-sans)", fontSize: '0.65rem', letterSpacing: '0.2em',
+                                textTransform: 'uppercase', color: 'var(--text-on-nav)', fontWeight: 800, margin: '0 0 18px',
                             }}>
                                 {col.title}
                             </h4>
@@ -82,11 +83,11 @@ export function Footer() {
                                 {col.links.map(l => (
                                     <li key={l.label} style={{ marginBottom: '12px' }}>
                                         <Link to={l.to} onClick={e => scrollTo(l.to, e)} style={{
-                                            fontFamily: "var(--font-sans)", fontSize: '0.85rem',
-                                            color: 'var(--text-secondary)', textDecoration: 'none', transition: 'color 0.2s',
+                                            fontFamily: "var(--font-sans)", fontSize: '0.85rem', fontWeight: 500,
+                                            color: 'var(--text-on-nav-muted)', textDecoration: 'none', transition: 'color 0.2s',
                                         }}
-                                            onMouseEnter={e => (e.currentTarget.style.color = 'var(--gold-mid)')}
-                                            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                                            onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-on-nav)')}
+                                            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-on-nav-muted)')}
                                         >
                                             {l.label}
                                         </Link>
@@ -100,8 +101,8 @@ export function Footer() {
                 {/* Bottom */}
                 <div style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12,
-                    paddingTop: '24px', borderTop: '1px solid var(--border-subtle)',
-                    fontFamily: "var(--font-sans)", fontSize: '0.72rem', color: 'var(--text-muted)',
+                    paddingTop: '24px', borderTop: '1px solid rgba(0, 0, 0, 0.12)',
+                    fontFamily: "var(--font-sans)", fontSize: '0.72rem', color: 'var(--text-on-nav-muted)', fontWeight: 500,
                 }}>
                     <span>© 2026 Travel Partner. All Rights Reserved.</span>
                 </div>

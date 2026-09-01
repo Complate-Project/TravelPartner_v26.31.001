@@ -190,9 +190,13 @@ export function AuthPage() {
                     background: 'linear-gradient(90deg, transparent, var(--gold-mid), transparent)',
                 }} />
 
-                {/* ── Logo ── */}
-                <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-                    <img src={logo} alt="Travel Partner" style={{ height: 72, objectFit: 'contain', display: 'block', margin: '0 auto' }} />
+                {/* ── Logo Header Banner ── */}
+                <div style={{
+                    textAlign: 'center', marginBottom: '28px',
+                    background: 'var(--bg-nav)', borderRadius: '14px',
+                    padding: '16px 20px', border: '1px solid var(--border-subtle)',
+                }}>
+                    <img src={logo} alt="Travel Partner" style={{ height: 64, objectFit: 'contain', display: 'block', margin: '0 auto' }} />
                 </div>
 
                 {/* ── Tabs ── */}

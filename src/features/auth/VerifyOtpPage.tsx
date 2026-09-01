@@ -124,18 +124,12 @@ export function VerifyOtpPage() {
                     background: 'linear-gradient(90deg, transparent, var(--gold-mid), transparent)',
                 }} />
 
-                <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-                    <img src={logo} alt="Travel Partner" style={{ height: 48, objectFit: 'contain', marginBottom: 8 }} />
-                    <h1 style={{
-                        fontFamily: "'Cormorant Garamond', Georgia, serif",
-                        fontSize: '2rem', letterSpacing: '0.15em',
-                        color: 'var(--gold-mid)', fontWeight: 400, marginBottom: '6px',
-                    }}>Travel Partner</h1>
-                    <span style={{
-                        display: 'block', fontSize: '0.6rem', letterSpacing: '0.3em',
-                        textTransform: 'uppercase', color: 'var(--text-muted)',
-                        fontFamily: "'Inter', sans-serif", fontWeight: 600,
-                    }}>Verify OTP</span>
+                <div style={{
+                    textAlign: 'center', marginBottom: '28px',
+                    background: 'var(--bg-nav)', borderRadius: '14px',
+                    padding: '14px 20px', border: '1px solid var(--border-subtle)',
+                }}>
+                    <img src={logo} alt="Travel Partner" style={{ height: 56, objectFit: 'contain', display: 'block', margin: '0 auto' }} />
                 </div>
 
                 <p style={{

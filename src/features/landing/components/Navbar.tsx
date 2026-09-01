@@ -11,7 +11,7 @@ export function Navbar() {
     const [menuOpen, setMenuOpen] = useState(false);
 
     const linkStyle = {
-        color: "var(--text-secondary)",
+        color: "var(--text-on-nav-muted)",
         fontSize: "0.78rem",
         letterSpacing: "0.04em",
         fontWeight: 500,
@@ -51,8 +51,8 @@ export function Navbar() {
                             href={link.href}
                             style={linkStyle}
                             onClick={e => handleAnchor(link.href, e)}
-                            onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-primary)')}
-                            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                            onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-on-nav)')}
+                            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-on-nav-muted)')}
                         >
                             {link.label}
                         </a>
