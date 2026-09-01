@@ -29,7 +29,7 @@ const fallbackTiers: { id: string; tag: string; name: string; features: { label:
             { label: 'Unlimited Profile Views', included: true },
             { label: 'Chat', included: true },
         ],
-        cta: 'Get Started',
+        cta: 'Buy Membership',
         featured: false,
     },
     {
@@ -43,7 +43,7 @@ const fallbackTiers: { id: string; tag: string; name: string; features: { label:
             { label: 'Audio Calls', included: true },
             { label: 'Advanced Search Filters', included: true },
         ],
-        cta: 'Get Started',
+        cta: 'Buy Membership',
         featured: false,
     },
     {
@@ -59,7 +59,7 @@ const fallbackTiers: { id: string; tag: string; name: string; features: { label:
             { label: 'Tour & Event Access', included: true },
             { label: 'Premium Experience', included: true },
         ],
-        cta: 'Get Started',
+        cta: 'Buy Membership',
         featured: true,
     },
 ];
@@ -91,7 +91,7 @@ function buildTiers(packages: Package[]) {
             tag: tagMap[pkg.tier_type] || pkg.name,
             name: String(pkg.price),
             features,
-            cta: 'Get Started',
+            cta: 'Buy Membership',
             featured: isFeatured,
         };
     });

@@ -58,13 +58,7 @@ export function Navbar() {
                         </a>
                     ))}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginLeft: 12 }}>
-                        <Link to="/login" style={linkStyle}
-                            onMouseEnter={e => (e.currentTarget.style.color = 'var(--gold-mid)')}
-                            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-secondary)')}
-                        >
-                            Sign In
-                        </Link>
-                        <Link to="/signup" style={{
+                        <Link to="/login" style={{
                             backgroundColor: 'var(--gold-mid)', color: '#000',
                             padding: '10px 22px', fontSize: '0.72rem', letterSpacing: '0.08em', fontWeight: 700,
                             textDecoration: 'none', fontFamily: "var(--font-sans)", borderRadius: '9999px',
@@ -73,7 +67,7 @@ export function Navbar() {
                             onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(1.1)')}
                             onMouseLeave={e => (e.currentTarget.style.filter = 'brightness(1)')}
                         >
-                            Get Started
+                            Sign In
                         </Link>
                     </div>
                 </div>
@@ -114,17 +108,14 @@ export function Navbar() {
                             {link.label}
                         </a>
                     ))}
-                    <Link to="/login" style={{ ...linkStyle, padding: '14px 24px', borderBottom: '1px solid var(--border-subtle)' }} onClick={() => setMenuOpen(false)}>
-                        Sign In
-                    </Link>
                     <div style={{ padding: '16px 24px' }}>
-                        <Link to="/signup" style={{
+                        <Link to="/login" style={{
                             display: 'block', textAlign: 'center',
                             backgroundColor: 'var(--gold-mid)', color: '#000',
                             padding: '12px 22px', fontSize: '0.78rem', letterSpacing: '0.08em', fontWeight: 700,
                             textDecoration: 'none', fontFamily: "var(--font-sans)", borderRadius: '9999px',
                         }} onClick={() => setMenuOpen(false)}>
-                            Get Started
+                            Sign In
                         </Link>
                     </div>
                 </div>
