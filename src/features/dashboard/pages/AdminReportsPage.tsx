@@ -780,6 +780,7 @@ export default function AdminReportsPage() {
 
                         {screenshotImgUrl ? (
                             <img
+                                key={screenshotRetryUrl || screenshotImgUrl}
                                 src={screenshotRetryUrl || screenshotImgUrl}
                                 alt="Screenshot"
                                 style={{
