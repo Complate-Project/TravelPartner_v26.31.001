@@ -210,7 +210,7 @@ export function AuthPage() {
                         fontSize: '0.65rem', letterSpacing: '0.18em', textTransform: 'uppercase',
                         fontWeight: 600, fontFamily: "'Inter', sans-serif",
                         textDecoration: 'none', borderRadius: '5px', transition: 'all 0.2s',
-                        color: !isLogin ? 'var(--text-primary)' : 'var(--text-muted)',
+                        color: !isLogin ? '#1a1a1a' : 'var(--text-muted)',
                         background: !isLogin ? 'var(--gold-glow)' : 'transparent',
                     }}>Register</Link>
                     <Link to="/login" style={{
@@ -218,7 +218,7 @@ export function AuthPage() {
                         fontSize: '0.65rem', letterSpacing: '0.18em', textTransform: 'uppercase',
                         fontWeight: 600, fontFamily: "'Inter', sans-serif",
                         textDecoration: 'none', borderRadius: '5px', transition: 'all 0.2s',
-                        color: isLogin ? 'var(--text-primary)' : 'var(--text-muted)',
+                        color: isLogin ? '#1a1a1a' : 'var(--text-muted)',
                         background: isLogin ? 'var(--gold-glow)' : 'transparent',
                     }}>Sign In</Link>
                 </div>
