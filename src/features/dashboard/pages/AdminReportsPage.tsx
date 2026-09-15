@@ -155,6 +155,7 @@ export default function AdminReportsPage() {
     const [screenshotModalOpen, setScreenshotModalOpen] = useState(false);
     const [screenshotImgUrl, setScreenshotImgUrl] = useState<string>('');
     const [screenshotLoadState, setScreenshotLoadState] = useState<'idle' | 'loading' | 'loaded' | 'failed'>('idle');
+    const [screenshotRetryUrl, setScreenshotRetryUrl] = useState<string>('');
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -250,6 +251,7 @@ export default function AdminReportsPage() {
         console.log('screenshot_url:', screenshotUrl);
         console.log('previewUrl:', fullUrl);
         setScreenshotImgUrl(fullUrl);
+        setScreenshotRetryUrl('');
         setScreenshotLoadState(fullUrl ? 'loading' : 'failed');
         setScreenshotModalOpen(true);
     }, [buildScreenshotUrl]);
@@ -258,6 +260,7 @@ export default function AdminReportsPage() {
     const closeScreenshotPreview = useCallback(() => {
         setScreenshotModalOpen(false);
         setScreenshotImgUrl('');
+        setScreenshotRetryUrl('');
         setScreenshotLoadState('idle');
     }, []);
 
@@ -777,7 +780,7 @@ export default function AdminReportsPage() {
 
                         {screenshotImgUrl ? (
                             <img
-                                src={screenshotImgUrl}
+                                src={screenshotRetryUrl || screenshotImgUrl}
                                 alt="Screenshot"
                                 style={{
                                     maxWidth: '90vw',
@@ -786,7 +789,21 @@ export default function AdminReportsPage() {
                                     display: screenshotLoadState === 'failed' ? 'none' : 'block',
                                 }}
                                 onLoad={() => setScreenshotLoadState('loaded')}
-                                onError={() => setScreenshotLoadState('failed')}
+                                onError={() => {
+                                    if (!screenshotRetryUrl) {
+                                        const fallbackUrl = screenshotImgUrl.includes('/api/uploads/')
+                                            ? screenshotImgUrl.replace('/api/uploads/', '/uploads/')
+                                            : screenshotImgUrl.includes('/uploads/')
+                                                ? screenshotImgUrl.replace('/uploads/', '/api/uploads/')
+                                                : '';
+                                        if (fallbackUrl) {
+                                            setScreenshotRetryUrl(fallbackUrl);
+                                            setScreenshotLoadState('loading');
+                                            return;
+                                        }
+                                    }
+                                    setScreenshotLoadState('failed');
+                                }}
                             />
                         ) : null}
 
