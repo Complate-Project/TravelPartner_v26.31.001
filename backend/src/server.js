@@ -48,9 +48,27 @@ app.use(express.json());
 const uploadsRoot = path.resolve(
     process.env.UPLOADS_DIR || path.join(__dirname, "..", "uploads")
 );
-app.use("/uploads", express.static(uploadsRoot));
+
+// express.static() bypasses the cors() middleware, so we must explicitly add
+// CORS headers on the uploads routes. Without this, browsers block images
+// loaded from the admin panel (e.g. deposit screenshots) even though the file
+// exists, showing "Failed to load screenshot".
+const uploadsCors = (req, res, next) => {
+    const origin = req.headers.origin;
+    if (origin && corsOrigins.includes(origin)) {
+        res.setHeader("Access-Control-Allow-Origin", origin);
+        res.setHeader("Vary", "Origin");
+    } else if (!origin) {
+        // Direct browser tab / non-CORS request — always allow.
+        res.setHeader("Access-Control-Allow-Origin", "*");
+    }
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    next();
+};
+
+app.use("/uploads", uploadsCors, express.static(uploadsRoot));
 // Keep uploads reachable when the reverse proxy forwards only /api/* to Node.
-app.use("/api/uploads", express.static(uploadsRoot));
+app.use("/api/uploads", uploadsCors, express.static(uploadsRoot));
 
 app.get("/", (req, res) => {
     res.send("Backend is running");
