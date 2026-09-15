@@ -19,11 +19,26 @@ const CheckIcon = () => (
     </svg>
 );
 
-const fallbackTiers: { id: string; tag: string; name: string; features: { label: string; included: boolean }[]; cta: string; featured: boolean }[] = [
+type LandingTier = {
+    id: string;
+    tag: string;
+    name: string;
+    price: number;
+    description: string;
+    durationMonths: number | null;
+    features: { label: string; included: boolean }[];
+    cta: string;
+    featured: boolean;
+};
+
+const fallbackTiers: LandingTier[] = [
     {
         id: 'regular',
         tag: 'Regular',
         name: '500',
+        price: 500,
+        description: 'A simple way to unlock the essentials.',
+        durationMonths: null,
         features: [
             { label: 'Partner Search', included: true },
             { label: 'Unlimited Profile Views', included: true },
@@ -36,6 +51,9 @@ const fallbackTiers: { id: string; tag: string; name: string; features: { label:
         id: 'gold',
         tag: 'Gold',
         name: '1000',
+        price: 1000,
+        description: 'More access for deeper connections.',
+        durationMonths: null,
         features: [
             { label: 'Partner Search', included: true },
             { label: 'Unlimited Profile Views', included: true },
@@ -50,6 +68,9 @@ const fallbackTiers: { id: string; tag: string; name: string; features: { label:
         id: 'premium',
         tag: 'Premium',
         name: '5000',
+        price: 5000,
+        description: 'The complete Travel Partner experience.',
+        durationMonths: null,
         features: [
             { label: 'Partner Search', included: true },
             { label: 'Unlimited Profile Views', included: true },
@@ -71,7 +92,7 @@ function buildTiers(packages: Package[]) {
 
     return packages.map(pkg => {
         const features: { label: string; included: boolean }[] = Array.isArray(pkg.features)
-            ? pkg.features.map(f => ({ label: f.display_name, included: true }))
+            ? pkg.features.map(f => ({ label: f.display_name || f.key, included: true }))
             : pkg.features
                 ? String(pkg.features).split(',').map((f: string) => ({ label: f.trim(), included: true }))
                 : [{ label: 'Full Access', included: true }];
@@ -89,7 +110,10 @@ function buildTiers(packages: Package[]) {
         return {
             id: String(pkg.id),
             tag: tagMap[pkg.tier_type] || pkg.name,
-            name: String(pkg.price),
+            name: pkg.name,
+            price: Number(pkg.price),
+            description: pkg.description || 'Unlock more possibilities with Travel Partner.',
+            durationMonths: Number(pkg.duration_months) > 0 ? Number(pkg.duration_months) : null,
             features,
             cta: 'Buy Membership',
             featured: isFeatured,
@@ -187,8 +211,22 @@ export function MembershipTiers() {
                                     color: tier.featured ? 'var(--gold-light)' : 'var(--text-primary)',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                                 }}>
-                                    {tier.name === 'Free' ? 'Free' : <PointsDisplay amount={tier.name} decimals={0} size={30} />}
+                                    {tier.price === 0 ? 'Free' : <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}><PointsDisplay amount={tier.price} decimals={0} size={30} /></span>}
                                 </div>
+                                <p style={{
+                                    color: 'var(--text-secondary)', fontSize: '0.78rem', lineHeight: 1.5,
+                                    margin: '14px auto 0', maxWidth: 230, fontFamily: "var(--font-sans)",
+                                }}>
+                                    {tier.description}
+                                </p>
+                                {tier.durationMonths && (
+                                    <span style={{
+                                        display: 'inline-block', marginTop: '12px', fontSize: '0.65rem',
+                                        color: 'var(--text-muted)', fontFamily: "var(--font-sans)",
+                                    }}>
+                                        Valid for {tier.durationMonths} month{tier.durationMonths === 1 ? '' : 's'}
+                                    </span>
+                                )}
                                 {tier.featured && (
                                     <span style={{
                                         display: 'inline-block', marginTop: '12px',
