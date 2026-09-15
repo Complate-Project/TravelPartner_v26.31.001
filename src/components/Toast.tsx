@@ -85,7 +85,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                     display: 'flex',
                     flexDirection: 'column',
                     gap: 10,
-                    zIndex: 3000,
+                    zIndex: 100000,
                     pointerEvents: 'none',
                     width: 'min(92vw, 420px)',
                 }}

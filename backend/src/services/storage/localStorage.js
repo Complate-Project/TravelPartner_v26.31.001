@@ -9,7 +9,10 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
-const UPLOADS_ROOT = path.resolve(process.env.UPLOADS_DIR || path.join(process.cwd(), "uploads"));
+// Anchored to the backend root (not process.cwd()) so the app works regardless
+// of the working directory the host (cPanel/Passenger/etc.) launches it with.
+const BACKEND_ROOT = path.resolve(__dirname, "..", "..", "..");
+const UPLOADS_ROOT = path.resolve(process.env.UPLOADS_DIR || path.join(BACKEND_ROOT, "uploads"));
 
 function ensureDir(dir) {
     fs.mkdirSync(dir, { recursive: true });
