@@ -27,7 +27,12 @@ export const SOCKET_URL: string = API_ORIGIN;
 export function resolveMediaUrl(url?: string | null): string {
     if (!url) return '';
     if (/^(https?:)?\/\//.test(url) || url.startsWith('data:')) return url;
-    return `${API_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`;
+    const path = url.startsWith('/uploads/')
+        ? `/api${url}`
+        : url.startsWith('/api/uploads/')
+            ? url
+            : `${url.startsWith('/') ? '' : '/'}${url}`;
+    return `${API_ORIGIN}${path}`;
 }
 
 if (!API_ORIGIN) {
