@@ -43,8 +43,12 @@ app.use(cors({
 
 app.use(express.json());
 
-// Static uploads (anchored to backend root, not process.cwd())
-app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
+// Static uploads must use the same directory as the local storage provider.
+// This also supports cPanel deployments that set UPLOADS_DIR explicitly.
+const uploadsRoot = path.resolve(
+    process.env.UPLOADS_DIR || path.join(__dirname, "..", "uploads")
+);
+app.use("/uploads", express.static(uploadsRoot));
 
 app.get("/", (req, res) => {
     res.send("Backend is running");
