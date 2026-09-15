@@ -26,12 +26,30 @@ export const SOCKET_URL: string = API_ORIGIN;
  */
 export function resolveMediaUrl(url?: string | null): string {
     if (!url) return '';
-    if (/^(https?:)?\/\//.test(url) || url.startsWith('data:')) return url;
-    const path = url.startsWith('/uploads/')
-        ? `/api${url}`
-        : url.startsWith('/api/uploads/')
-            ? url
-            : `${url.startsWith('/') ? '' : '/'}${url}`;
+    const value = url.trim().replace(/\\/g, '/');
+    if (value.startsWith('data:')) return value;
+
+    // Rewrite absolute legacy upload URLs as well as relative database values.
+    // Older rows may contain https://backend/uploads/... while cPanel proxies
+    // the working route through /api/uploads/....
+    if (/^(https?:)?\/\//.test(value)) {
+        try {
+            const parsed = new URL(value);
+            if (parsed.pathname.startsWith('/uploads/')) {
+                parsed.pathname = `/api${parsed.pathname}`;
+                return parsed.toString();
+            }
+        } catch {
+            return value;
+        }
+        return value;
+    }
+
+    const path = value.startsWith('/uploads/')
+        ? `/api${value}`
+        : value.startsWith('/api/uploads/')
+            ? value
+            : `${value.startsWith('/') ? '' : '/'}${value}`;
     return `${API_ORIGIN}${path}`;
 }
 
