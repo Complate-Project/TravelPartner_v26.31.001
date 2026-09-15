@@ -49,6 +49,8 @@ const uploadsRoot = path.resolve(
     process.env.UPLOADS_DIR || path.join(__dirname, "..", "uploads")
 );
 app.use("/uploads", express.static(uploadsRoot));
+// Keep uploads reachable when the reverse proxy forwards only /api/* to Node.
+app.use("/api/uploads", express.static(uploadsRoot));
 
 app.get("/", (req, res) => {
     res.send("Backend is running");

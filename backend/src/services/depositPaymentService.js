@@ -53,7 +53,7 @@ function normalizeImageUrl(v) {
     const url = v.trim();
     if (!url) return null;
     const looksLikeUploadedUrl =
-        url.startsWith("/uploads/") || url.startsWith("http://") || url.startsWith("https://");
+        url.startsWith("/uploads/") || url.startsWith("/api/uploads/") || url.startsWith("http://") || url.startsWith("https://");
     return looksLikeUploadedUrl && url.length <= 500 ? url : undefined;
 }
 

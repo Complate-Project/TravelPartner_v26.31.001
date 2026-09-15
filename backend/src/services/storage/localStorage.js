@@ -56,7 +56,8 @@ async function deleteFile(key) {
 }
 
 function getPublicUrl(key) {
-    return `/uploads/${key}`;
+    // Keep the media URL behind the same /api prefix commonly proxied by cPanel.
+    return `/api/uploads/${key}`;
 }
 
 module.exports = { ensureReady, uploadFile, deleteFile, getPublicUrl, extFromName };
