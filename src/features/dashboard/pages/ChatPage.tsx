@@ -604,7 +604,7 @@ export function ChatPage() {
                         /* ══════════════ THREAD ══════════════ */
                         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, animation: 'slideUp .25s ease' }}>
                             {/* thread header */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: 'var(--bg-nav)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--border-default)', flexShrink: 0 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: 'var(--bg-card)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--border-default)', flexShrink: 0 }}>
                                 <button onClick={() => { setSelected(null); setMessages([]); }}
                                     style={{ width: 36, height: 36, borderRadius: 11, border: '1px solid var(--border-default)', background: 'var(--bg-input)', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all .15s' }}
                                     onMouseEnter={e => { e.currentTarget.style.background = 'rgba(212,167,44,0.2)'; e.currentTarget.style.borderColor = 'rgba(212,167,44,0.4)'; }}
@@ -744,7 +744,7 @@ export function ChatPage() {
                             </div>
 
                             {/* input bar */}
-                            <div style={{ padding: '10px 12px', background: 'var(--bg-nav)', backdropFilter: 'blur(20px)', borderTop: '1px solid var(--border-default)', flexShrink: 0 }}>
+                            <div style={{ padding: '10px 12px', background: 'var(--bg-card)', backdropFilter: 'blur(20px)', borderTop: '1px solid var(--border-default)', flexShrink: 0 }}>
                                 {partnerLocked ? (
                                     <div style={{
                                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
