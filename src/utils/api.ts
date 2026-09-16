@@ -854,6 +854,7 @@ export interface Post {
     created_at: string;
     user_id: number;
     author_name: string;
+    author_avatar: string | null;
     author_role: string;
     like_count: number;
     comment_count: number;
@@ -890,6 +891,7 @@ export interface ChatMessage {
 export interface ActiveUser {
     id: number;
     name: string;
+    avatar_url?: string | null;
     last_seen: string | null;
     is_online: number;
     request_status?: 'pending' | 'accepted' | 'rejected';

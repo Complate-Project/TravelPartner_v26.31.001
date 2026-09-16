@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { resolveMediaUrl, getMediaFallbackUrl } from '../config/apiConfig';
 
-export interface MediaImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+export type MediaImageProps = Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'src'> & {
     src?: string | null;
     fallbackContent?: React.ReactNode;
-}
+};
 
 /**
  * Image component that resolves backend media URLs to the full API origin

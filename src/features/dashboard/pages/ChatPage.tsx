@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
-import { SOCKET_URL, resolveMediaUrl } from '../../../config/apiConfig';
+import { SOCKET_URL } from '../../../config/apiConfig';
 import { useAuth } from '../../../context/AuthContext';
 import { useMembership } from '../../../context/MembershipContext';
 import { serviceApi, providerApi, userApi } from '../../../utils/api';
