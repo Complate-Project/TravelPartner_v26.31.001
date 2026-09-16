@@ -821,6 +821,18 @@ export const providerApi = {
             interests: string | null;
         }>>('/provider/list'),
 
+    // ── Members directory (active-membership users) ──
+    getMembers: () =>
+        request<Array<{
+            id: number;
+            name: string;
+            avatar_url: string | null;
+            profession: string | null;
+            location: string | null;
+            interests: string | null;
+            date_of_birth: string | null;
+        }>>('/provider/members'),
+
     // ── All events (Places quick-link) ──
     getAllEvents: () =>
         request<Array<{

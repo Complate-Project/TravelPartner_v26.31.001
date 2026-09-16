@@ -4,31 +4,40 @@ import { providerApi, userApi } from '../../../utils/api';
 import { useAuth } from '../../../context/AuthContext';
 import { MediaImage } from '../../../components/MediaImage';
 
-interface ProviderProfile {
+interface DirectoryProfile {
     id: number;
     name: string;
     avatar_url: string | null;
     profession: string | null;
     location: string | null;
     interests: string | null;
+    date_of_birth?: string | null;
 }
 
 export function ProviderDirectoryPage() {
     const { user } = useAuth();
     const isUser = user?.role === 'user';
-    const [providers, setProviders] = useState<ProviderProfile[]>([]);
+    const [profiles, setProfiles] = useState<DirectoryProfile[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+
+    const title = isUser ? 'Provider Directory' : 'Members Directory';
+    const subtitle = isUser
+        ? 'Browse verified provider profiles'
+        : 'Browse membership-holder user profiles';
+    const emptyMessage = isUser
+        ? 'No membership-holder providers available right now.'
+        : 'No membership-holder users available right now.';
 
     useEffect(() => {
         const load = async () => {
             try {
                 setLoading(true);
-                const res = isUser ? await userApi.getProviders() : await providerApi.getProviders();
+                const res = isUser ? await userApi.getProviders() : await providerApi.getMembers();
                 if (res.error) setError(res.error);
-                else setProviders(res.data || []);
+                else setProfiles(res.data || []);
             } catch (e: any) {
-                setError(e?.message || 'Failed to load providers');
+                setError(e?.message || 'Failed to load directory');
             } finally {
                 setLoading(false);
             }
@@ -52,7 +61,7 @@ export function ProviderDirectoryPage() {
                     fontFamily: "'Inter', sans-serif",
                     marginBottom: '4px',
                 }}>
-                    Provider Directory
+                    {title}
                 </h2>
                 <p style={{
                     color: 'var(--text-muted)',
@@ -60,12 +69,12 @@ export function ProviderDirectoryPage() {
                     fontFamily: "'Inter', sans-serif",
                     marginBottom: '16px',
                 }}>
-                    Browse verified provider profiles
+                    {subtitle}
                 </p>
 
                 {loading && (
                     <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '40px 0' }}>
-                        Loading providers...
+                        Loading...
                     </p>
                 )}
 
@@ -75,19 +84,19 @@ export function ProviderDirectoryPage() {
                     </p>
                 )}
 
-                {!loading && !error && providers.length === 0 && (
+                {!loading && !error && profiles.length === 0 && (
                     <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '40px 0' }}>
-                        No providers available yet.
+                        {emptyMessage}
                     </p>
                 )}
 
-                {!loading && providers.length > 0 && (
+                {!loading && profiles.length > 0 && (
                     <div style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(2, 1fr)',
                         gap: '12px',
                     }}>
-                        {providers.map(p => (
+                        {profiles.map(p => (
                             <div
                                 key={p.id}
                                 style={{

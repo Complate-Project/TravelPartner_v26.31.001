@@ -596,16 +596,20 @@ router.post("/events/:id/leave", authMiddleware, (req, res) => {
 });
 
 // ── GET /api/user/providers ──────────────────────────────────────────────────
-// Returns all provider profiles for the user's "Models" quick-link.
+// Returns verified provider profiles for the user's "Models" quick-link and
+// Provider Directory. Only membership-holding providers are listed so the
+// directory shows verified, upgraded providers only.
 router.get("/providers", authMiddleware, (req, res) => {
     const userId = req.user.id;
     db.query(
-        `SELECT id, name, avatar_url, profession, location, interests, date_of_birth
-         FROM users
-         WHERE role = 'provider'
-           AND id != ?
-           AND is_active = 1
-         ORDER BY created_at DESC
+        `SELECT u.id, u.name, u.avatar_url, u.profession, u.location, u.interests, u.date_of_birth
+         FROM users u
+         WHERE u.role = 'provider'
+           AND u.id != ?
+           AND u.is_active = 1
+           AND u.membership_package_id IS NOT NULL
+           AND (u.membership_expires_at IS NULL OR u.membership_expires_at >= NOW())
+         ORDER BY u.created_at DESC
          LIMIT 50`,
         [userId],
         (err, rows) => {

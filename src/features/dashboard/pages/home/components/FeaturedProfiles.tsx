@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { resolveMediaUrl } from '../../../../../config/apiConfig';
 
 export function FeaturedProfiles({
@@ -6,6 +5,7 @@ export function FeaturedProfiles({
     loading,
     isUser,
     onSelect,
+    onShowMore,
 }: {
     profiles: Array<{
         id: number;
@@ -20,8 +20,8 @@ export function FeaturedProfiles({
     loading?: boolean;
     isUser?: boolean;
     onSelect: (id: number) => void;
+    onShowMore: () => void;
 }) {
-    const [showAll, setShowAll] = useState(false);
 
     const toFullUploadUrl = (url: string | null): string | undefined => {
         return resolveMediaUrl(url) || undefined;
@@ -44,7 +44,7 @@ export function FeaturedProfiles({
                 {!loading && profiles.length > 0 && (
                     <button
                         type="button"
-                        onClick={() => setShowAll(v => !v)}
+                        onClick={onShowMore}
                         style={{
                             background: 'transparent',
                             border: 'none',
@@ -61,18 +61,17 @@ export function FeaturedProfiles({
                         onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
                         onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
                     >
-                        {showAll ? 'Show Less ↑' : 'Show More →'}
+                        Show More →
                     </button>
                 )}
             </div>
-            {/* Horizontal strip → grid when expanded to show all */}
+            {/* Horizontal strip — Show More opens the full Provider Directory */}
             <div style={{
                 display: 'flex',
                 gap: 'clamp(10px, 3vw, 14px)',
                 paddingBottom: '10px',
-                ...(showAll
-                    ? { flexWrap: 'wrap' as const }
-                    : { overflowX: 'auto' as const, WebkitOverflowScrolling: 'touch' as const }),
+                overflowX: 'auto',
+                WebkitOverflowScrolling: 'touch',
             }}>
                 {loading && (
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', padding: '20px 0' }}>
@@ -102,7 +101,7 @@ export function FeaturedProfiles({
                             }
                         }}
                         style={{
-                            flex: showAll ? '0 0 calc(33.333% - 10px)' : '0 0 clamp(120px, 38vw, 150px)',
+                            flex: '0 0 clamp(120px, 38vw, 150px)',
                             minWidth: 0,
                             boxSizing: 'border-box',
                             borderRadius: '12px',
