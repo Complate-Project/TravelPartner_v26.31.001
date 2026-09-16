@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { providerApi, type PartnerRequestItem, type PartnerRequestStatus } from "../../../../utils/api";
 import { useToast } from "../../../../components/Toast";
+import { useNotifications } from "../../../../context/NotificationContext";
 import { MediaImage } from "../../../../components/MediaImage";
 
 const fadeUp = {
@@ -413,6 +414,7 @@ function RequesterDetailsModal({
 
 export function PartnerRequestsPanel() {
     const toast = useToast();
+    const { markRequestsSeen } = useNotifications();
     const [requests, setRequests] = useState<PartnerRequestItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -434,6 +436,7 @@ export function PartnerRequestsPanel() {
 
     useEffect(() => {
         load();
+        markRequestsSeen();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

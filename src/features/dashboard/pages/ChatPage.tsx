@@ -4,6 +4,7 @@ import { io, Socket } from 'socket.io-client';
 import { SOCKET_URL } from '../../../config/apiConfig';
 import { useAuth } from '../../../context/AuthContext';
 import { useMembership } from '../../../context/MembershipContext';
+import { useNotifications } from '../../../context/NotificationContext';
 import { serviceApi, providerApi, userApi } from '../../../utils/api';
 import type { ChatMessage, ActiveUser } from '../../../utils/api';
 import { TopNav } from './TopNav';
@@ -127,6 +128,7 @@ export function ChatPage() {
     const isProvider = (user as any)?.role === 'provider';
     const { hasFeature } = useMembership();
     const { callState } = useCallContext();
+    const { markChatSeen, setActiveChatPartner } = useNotifications();
     const navigate = useNavigate();
     const { role } = useParams<{ role: string }>();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -161,6 +163,13 @@ export function ChatPage() {
     const [hasBalance, setHasBalance] = useState(true);
     const [showGiftPicker, setShowGiftPicker] = useState(false);
     const [reportOpen, setReportOpen] = useState(false);
+
+    // Entering the Chat page counts as "seen" for the nav unread badge.
+    useEffect(() => {
+        markChatSeen();
+        return () => setActiveChatPartner(null);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         (async () => {
@@ -342,6 +351,7 @@ export function ChatPage() {
 
     useEffect(() => {
         selectedIdRef.current = selected?.id ?? null;
+        setActiveChatPartner(selected?.id ?? null);
         if (!selected) return;
         // Clear unread badge when opening a conversation
         setUnreadCounts((prev) => {

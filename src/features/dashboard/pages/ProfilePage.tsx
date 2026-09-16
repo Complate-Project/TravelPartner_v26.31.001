@@ -4,6 +4,7 @@ import { TopNav } from "./TopNav";
 import { AdminAccountDeletionSection } from "./AdminAccountDeletionSection";
 import { useAuth } from "../../../context/AuthContext";
 import { useMembership } from "../../../context/MembershipContext";
+import { useNotifications } from "../../../context/NotificationContext";
 import {
     userApi,
     type UpdateUserProfilePayload,
@@ -186,6 +187,7 @@ export function ProfilePage() {
     const { role } = useParams<{ role: string }>();
     const auth = useAuth();
     const { hasFeature } = useMembership();
+    const { hasUnreadRequests } = useNotifications();
 
     const [profile, setProfile] = useState<UserProfile | null>(null);
 
@@ -1263,12 +1265,24 @@ const uploadRes = await userApi.uploadImage(file, 'avatars');
 
                             {role !== "admin" && (
                                 <button
-                                    style={goldButtonStyle}
+                                    style={{ ...goldButtonStyle, position: "relative" }}
                                     onClick={() => navigate("../services")}
                                     onMouseEnter={onGoldEnter}
                                     onMouseLeave={onGoldLeave}
                                 >
                                     Services
+                                    {role === "provider" && hasUnreadRequests && (
+                                        <span style={{
+                                            position: 'absolute',
+                                            top: 10,
+                                            right: 14,
+                                            width: 10,
+                                            height: 10,
+                                            borderRadius: '50%',
+                                            background: 'var(--danger, #ef4444)',
+                                            boxShadow: '0 0 8px rgba(239,68,68,0.7)',
+                                        }} />
+                                    )}
                                 </button>
                             )}
 

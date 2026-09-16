@@ -129,7 +129,9 @@ const PORT = process.env.PORT || 5000;
 const httpServer = require("http").createServer(app);
 
 const { setupSocket } = require("./socket/socket");
-setupSocket(httpServer);
+const io = setupSocket(httpServer);
+// Expose the Socket.IO server to routes that need to emit realtime events.
+app.set("socketio", io);
 
 httpServer.listen(PORT, async () => {
     console.log(`Server running on port ${PORT}`);

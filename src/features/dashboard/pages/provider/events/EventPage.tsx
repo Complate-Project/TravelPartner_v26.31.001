@@ -15,11 +15,13 @@ import type { Event } from './types/event';
 import { PartnerSearchPanel } from '../../partner/PartnerSearchPanel';
 import { PartnerRequestsPanel } from '../../partner/PartnerRequestsPanel';
 import { FeatureGate } from '../../../../../components/FeatureGate';
+import { useNotifications } from '../../../../../context/NotificationContext';
 
 export function EventPage() {
     const { role = 'user' } = useParams<{ role: string }>();
     const { user } = useAuth();
     const { hasFeature } = useMembership();
+    const { hasUnreadRequests, markRequestsSeen } = useNotifications();
     const currentUserId = user?.id ?? 0;
 
     const userRole = user?.role ?? role;
@@ -195,7 +197,10 @@ export function EventPage() {
 
                 {userRole === 'provider' && providerHasMembership && (
                     <button
-                        onClick={() => setActiveTab('requests')}
+                        onClick={() => {
+                            setActiveTab('requests');
+                            markRequestsSeen();
+                        }}
                         style={{
                             flex: 1,
                             background: 'none',
@@ -210,6 +215,19 @@ export function EventPage() {
                         }}
                     >
                         Requests
+                        {activeTab !== 'requests' && hasUnreadRequests && (
+                            <span style={{
+                                position: 'absolute',
+                                top: 8,
+                                right: '18%',
+                                minWidth: 8,
+                                width: 8,
+                                height: 8,
+                                borderRadius: '50%',
+                                background: 'var(--danger, #ef4444)',
+                                boxShadow: '0 0 6px rgba(239,68,68,0.7)',
+                            }} />
+                        )}
                         {activeTab === 'requests' && (
                             <span style={{
                                 position: 'absolute',

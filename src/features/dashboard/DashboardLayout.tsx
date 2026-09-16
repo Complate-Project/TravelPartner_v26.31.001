@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { AdminMoreMenu } from './MoreMenu';
+import { useNotifications } from '../../context/NotificationContext';
 
 const ICONS = {
     home: (
@@ -145,6 +146,7 @@ const PROVIDER_NAV: NavItem[] = [
 
 export function BottomNav() {
     const { role } = useParams<{ role: string }>();
+    const { chatUnread, hasUnreadRequests } = useNotifications();
 
     // Select the appropriate navigation array based on role
     let NAV = USER_NAV;
@@ -153,6 +155,8 @@ export function BottomNav() {
 
     const basePath = `/${role}/dashboard`;
     const [moreOpen, setMoreOpen] = useState(false);
+
+    const requestDot = role === 'provider' && hasUnreadRequests;
 
     return (
         <nav
@@ -259,27 +263,64 @@ export function BottomNav() {
                                 overflow: 'hidden',
                             })}
                         >
-                            {({ isActive }) => (
-                                <>
-                                    <span style={{
-                                        color: isActive ? 'var(--gold-mid)' : 'var(--text-on-nav-muted)',
-                                        display: 'flex',
-                                        transform: isActive ? 'scale(1.1)' : 'scale(1)',
-                                        transition: 'transform 0.2s ease',
-                                        filter: isActive ? 'drop-shadow(0 0 8px var(--gold-mid))' : 'none',
-                                    }}>
-                                        {item.icon}
-                                    </span>
-                                    <span style={{
-                                        textOverflow: 'ellipsis',
-                                        overflow: 'hidden',
-                                        width: '100%',
-                                        textAlign: 'center',
-                                    }}>
-                                        {item.label}
-                                    </span>
-                                </>
-                            )}
+                            {({ isActive }) => {
+                                const showChatBadge = item.label === 'CHAT' && chatUnread > 0;
+                                const showRequestDot = item.label === 'PROFILE' && requestDot;
+                                return (
+                                    <>
+                                        <span style={{
+                                            position: 'relative',
+                                            color: isActive ? 'var(--gold-mid)' : 'var(--text-on-nav-muted)',
+                                            display: 'flex',
+                                            transform: isActive ? 'scale(1.1)' : 'scale(1)',
+                                            transition: 'transform 0.2s ease',
+                                            filter: isActive ? 'drop-shadow(0 0 8px var(--gold-mid))' : 'none',
+                                        }}>
+                                            {item.icon}
+                                            {showChatBadge && (
+                                                <span style={{
+                                                    position: 'absolute',
+                                                    top: -6,
+                                                    right: -10,
+                                                    minWidth: 18,
+                                                    height: 18,
+                                                    padding: '0 4px',
+                                                    borderRadius: 999,
+                                                    background: 'var(--danger, #ef4444)',
+                                                    color: '#fff',
+                                                    fontSize: '0.62rem',
+                                                    fontWeight: 800,
+                                                    lineHeight: '18px',
+                                                    textAlign: 'center',
+                                                    boxShadow: '0 0 8px rgba(239,68,68,0.6)',
+                                                }}>
+                                                    {chatUnread > 9 ? '9+' : chatUnread}
+                                                </span>
+                                            )}
+                                            {showRequestDot && (
+                                                <span style={{
+                                                    position: 'absolute',
+                                                    top: -4,
+                                                    right: -8,
+                                                    width: 10,
+                                                    height: 10,
+                                                    borderRadius: '50%',
+                                                    background: 'var(--danger, #ef4444)',
+                                                    boxShadow: '0 0 8px rgba(239,68,68,0.7)',
+                                                }} />
+                                            )}
+                                        </span>
+                                        <span style={{
+                                            textOverflow: 'ellipsis',
+                                            overflow: 'hidden',
+                                            width: '100%',
+                                            textAlign: 'center',
+                                        }}>
+                                            {item.label}
+                                        </span>
+                                    </>
+                                );
+                            }}
                         </NavLink>
                     );
                 })}

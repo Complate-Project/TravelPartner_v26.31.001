@@ -83,6 +83,19 @@ router.post(
                                     }
                                     return res.status(500).json({ message: "An internal server error occurred." });
                                 }
+
+                                // Real-time: notify the provider so their notification
+                                // badge lights up without polling.
+                                const io = req.app.get("socketio");
+                                if (io) {
+                                    io.to(`user_${providerId}`).emit("partnerRequest:new", {
+                                        request_id: result.insertId,
+                                        user_id: userId,
+                                        provider_id: providerId,
+                                        status: "pending",
+                                    });
+                                }
+
                                 return res.status(201).json({
                                     message: "Partner request sent",
                                     request_id: result.insertId,
