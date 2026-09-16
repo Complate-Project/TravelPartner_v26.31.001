@@ -226,23 +226,16 @@ router.post(
 );
 
 // ── GET /api/provider/messages?with=<userId> — get DM thread
+// No membership gate: users must always be able to read existing conversations.
 router.get(
     "/messages",
     authMiddleware,
     roleMiddleware(["user", "provider"]),
-    requireFeature("CHAT"),
     async (req, res) => {
 
         const me = req.user.id;
         const partner = parseInt(req.query.with, 10);
         if (!partner) return res.status(400).json({ message: "Missing 'with' query param." });
-
-        // Partner-request chat rule: user↔provider chat requires an accepted
-        // partner request (plus membership for the user side).
-        const perm = await checkChatPermission(me, partner);
-        if (!perm.allowed) {
-            return res.status(perm.statusCode || 403).json({ message: perm.message });
-        }
 
         try {
             const rows = await chatService.getMessages({ senderId: me, partnerId: partner });
