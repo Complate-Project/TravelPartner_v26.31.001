@@ -45,12 +45,31 @@ export function resolveMediaUrl(url?: string | null): string {
         return value;
     }
 
-    const path = value.startsWith('/uploads/')
-        ? `/api${value}`
-        : value.startsWith('/api/uploads/')
-            ? value
-            : `${value.startsWith('/') ? '' : '/'}${value}`;
-    return `${API_ORIGIN}${path}`;
+    const clean = value.startsWith('/') ? value : `/${value}`;
+    const path = clean.startsWith('/uploads/')
+        ? `/api${clean}`
+        : clean.startsWith('/api/uploads/')
+            ? clean
+            : clean.startsWith('/avatars/') || clean.startsWith('/posts/') || clean.startsWith('/deposits/') || clean.startsWith('/gifts/')
+                ? `/api/uploads${clean}`
+                : clean;
+    return API_ORIGIN ? `${API_ORIGIN}${path}` : path;
+}
+
+/**
+ * Returns an alternate URL (swapping /api/uploads/ and /uploads/) to retry
+ * when an image fails to load due to reverse-proxy route differences.
+ */
+export function getMediaFallbackUrl(url?: string | null): string {
+    if (!url) return '';
+    const clean = url.trim().replace(/\\/g, '/');
+    if (clean.includes('/api/uploads/')) {
+        return clean.replace('/api/uploads/', '/uploads/');
+    }
+    if (clean.includes('/uploads/')) {
+        return clean.replace('/uploads/', '/api/uploads/');
+    }
+    return '';
 }
 
 if (!API_ORIGIN) {

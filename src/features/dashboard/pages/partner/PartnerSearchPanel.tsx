@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { userApi, type PartnerSearchFilters, type PartnerSearchResponse, type UserProfile, type PartnerRequestStatus } from "../../../../utils/api";
 import { FeatureGate } from "../../../../components/FeatureGate";
 import { ProfileDetailsModal } from "./ProfileDetailsModal";
+import { MediaImage } from "../../../../components/MediaImage";
 
 const fadeUp = {
     hidden: { opacity: 0, y: 14 },
@@ -87,7 +88,12 @@ function Avatar({ profile, size = 54 }: { profile: Pick<UserProfile, "name" | "a
             }}
         >
             {profile.avatar_url ? (
-                <img src={profile.avatar_url} alt={profile.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                <MediaImage
+                    src={profile.avatar_url}
+                    alt={profile.name}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    fallbackContent={<span style={{ fontWeight: 800, color: "#fff", fontSize: size * 0.38 }}>{initials}</span>}
+                />
             ) : (
                 <span style={{ fontWeight: 800, color: "#fff", fontSize: size * 0.38 }}>{initials}</span>
             )}

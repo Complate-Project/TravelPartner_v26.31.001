@@ -1,4 +1,4 @@
-
+import { MediaImage } from '../../../../components/MediaImage';
 
 function avatarColor(name: string) {
     const colors = [
@@ -15,9 +15,17 @@ function avatarColor(name: string) {
 }
 
 /* ─────────────────────────────────────────────────────────────── Avatar */
-export function Avatar({ name, size = 40 }: { name: string; size?: number }) {
+export function Avatar({
+    name,
+    avatar_url,
+    size = 40,
+}: {
+    name: string;
+    avatar_url?: string | null;
+    size?: number;
+}) {
     const initials = name ? name.substring(0, 2).toUpperCase() : '??';
-    return (
+    const initialsBadge = (
         <div style={{
             width: size, height: size, borderRadius: '50%',
             background: avatarColor(name),
@@ -28,4 +36,31 @@ export function Avatar({ name, size = 40 }: { name: string; size?: number }) {
             {initials}
         </div>
     );
+
+    if (!avatar_url) {
+        return initialsBadge;
+    }
+
+    return (
+        <div style={{
+            width: size,
+            height: size,
+            borderRadius: '50%',
+            overflow: 'hidden',
+            flexShrink: 0,
+            background: 'var(--bg-card)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+        }}>
+            <MediaImage
+                src={avatar_url}
+                alt={name}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                fallbackContent={initialsBadge}
+            />
+        </div>
+    );
 }
+
+export default Avatar;

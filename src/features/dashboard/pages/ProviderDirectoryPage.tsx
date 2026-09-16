@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { TopNav } from './TopNav';
 import { providerApi, userApi } from '../../../utils/api';
 import { useAuth } from '../../../context/AuthContext';
+import { MediaImage } from '../../../components/MediaImage';
 
 interface ProviderProfile {
     id: number;
@@ -99,9 +100,18 @@ export function ProviderDirectoryPage() {
                                 }}
                             >
                                 {p.avatar_url ? (
-                                    <img src={p.avatar_url} alt={p.name} style={{
+                                    <MediaImage src={p.avatar_url} alt={p.name} style={{
                                         width: '100%', height: '170px', objectFit: 'cover', display: 'block',
-                                    }} />
+                                    }} fallbackContent={(
+                                        <div style={{
+                                            width: '100%', height: '170px',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            background: 'linear-gradient(135deg, var(--bg-card-hover), var(--bg-card))',
+                                            color: 'var(--text-secondary)', fontSize: '2rem', fontWeight: 700,
+                                        }}>
+                                            {p.name ? p.name.substring(0, 2).toUpperCase() : '?'}
+                                        </div>
+                                    )} />
                                 ) : (
                                     <div style={{
                                         width: '100%', height: '170px',

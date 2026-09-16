@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { userApi, providerApi, type PartnerRequestStatus } from "../../../../utils/api";
 import { useAuth } from "../../../../context/AuthContext";
 import { ReportUserModal } from "../../../../components/ReportUserModal";
+import { MediaImage } from "../../../../components/MediaImage";
 
 /**
  * The profile details required by the View Profile modal. Both partner-search
@@ -53,7 +54,12 @@ function Avatar({ name, avatar_url, size = 54 }: { name: string; avatar_url: str
             }}
         >
             {avatar_url ? (
-                <img src={avatar_url} alt={name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                <MediaImage
+                    src={avatar_url}
+                    alt={name}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    fallbackContent={<span style={{ fontWeight: 800, color: "#fff", fontSize: size * 0.38 }}>{initials}</span>}
+                />
             ) : (
                 <span style={{ fontWeight: 800, color: "#fff", fontSize: size * 0.38 }}>{initials}</span>
             )}

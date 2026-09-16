@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { providerApi, type PartnerRequestItem, type PartnerRequestStatus } from "../../../../utils/api";
 import { useToast } from "../../../../components/Toast";
+import { MediaImage } from "../../../../components/MediaImage";
 
 const fadeUp = {
     hidden: { opacity: 0, y: 14 },
@@ -48,7 +49,12 @@ function Avatar({ name, avatar_url, size = 54 }: { name: string; avatar_url: str
             }}
         >
             {avatar_url ? (
-                <img src={avatar_url} alt={name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                <MediaImage
+                    src={avatar_url}
+                    alt={name}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    fallbackContent={<span style={{ fontWeight: 800, color: "#fff", fontSize: size * 0.38 }}>{initials}</span>}
+                />
             ) : (
                 <span style={{ fontWeight: 800, color: "#fff", fontSize: size * 0.38 }}>{initials}</span>
             )}

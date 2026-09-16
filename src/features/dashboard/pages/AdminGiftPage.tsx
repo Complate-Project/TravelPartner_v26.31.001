@@ -6,6 +6,8 @@ import type { Gift, GiftAsset } from '../../gift/types/gift';
 import { useToast } from '../../../components/Toast';
 import { useConfirmDialog } from '../../../components/ConfirmDialog';
 import { PointsDisplay } from '../../../components/PointsDisplay';
+import { MediaImage } from '../../../components/MediaImage';
+import { GiftVisual } from '../../gift/components/GiftVisual';
 
 const fadeUp = {
     hidden: { opacity: 0, y: 12 },
@@ -268,21 +270,17 @@ export function AdminGiftPage() {
     };
 
     const assetThumb = (a: { url: string; name: string }) => (
-        <img
+        <MediaImage
             src={a.url}
             alt={a.name}
             style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
-            onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden'; }}
+            fallbackContent={<span style={{ fontSize: '1.5rem', lineHeight: 1 }}>🎁</span>}
         />
     );
 
-    const giftVisual = (g: Gift) => {
-        const url = g.asset?.url || g.image;
-        if (url) {
-            return <img src={url} alt={g.name} style={{ width: 32, height: 32, objectFit: 'contain' }} />;
-        }
-        return <span style={{ fontSize: '1.4rem' }}>{g.icon || '🎁'}</span>;
-    };
+    const giftVisual = (g: Gift) => (
+        <GiftVisual gift={g} size={32} fontSize="1.4rem" />
+    );
 
     return (
         <>

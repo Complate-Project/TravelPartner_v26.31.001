@@ -18,6 +18,7 @@ import { GiftVisual } from '../../gift/components/GiftVisual';
 import { parseGiftMessage } from '../../gift/types/gift';
 import type { Gift } from '../../gift/types/gift';
 import { ReportUserModal } from '../../../components/ReportUserModal';
+import { MediaImage } from '../../../components/MediaImage';
 
 
 /* ─── helpers ─── */
@@ -40,17 +41,52 @@ const fmtDate = (d: string) => {
 const timeAgo = (d: string) => { const s = (Date.now() - new Date(d).getTime()) / 1000; if (s < 60) return 'just now'; if (s < 3600) return `${Math.floor(s / 60)}m ago`; if (s < 86400) return `${Math.floor(s / 3600)}h ago`; return `${Math.floor(s / 86400)}d ago`; };
 
 /* ─── Avatar ─── */
-function Av({ name, size = 40, online = false }: { name: string; size?: number; online?: boolean }) {
+function Av({
+    name,
+    avatar_url,
+    size = 40,
+    online = false,
+}: {
+    name: string;
+    avatar_url?: string | null;
+    size?: number;
+    online?: boolean;
+}) {
     return (
         <div style={{ position: 'relative', flexShrink: 0 }}>
-            <div style={{
-                width: size, height: size, borderRadius: '50%',
-                background: `linear-gradient(${ug(name)})`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#fff', fontWeight: 800, fontSize: size * 0.35,
-                fontFamily: "'Inter',sans-serif", letterSpacing: '0.02em',
-                boxShadow: `0 2px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2)`,
-            }}>{ini(name)}</div>
+            {avatar_url ? (
+                <div style={{
+                    width: size, height: size, borderRadius: '50%',
+                    overflow: 'hidden', flexShrink: 0,
+                    boxShadow: `0 2px 8px rgba(0,0,0,0.4)`,
+                    background: 'var(--bg-card)',
+                }}>
+                    <MediaImage
+                        src={avatar_url}
+                        alt={name}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                        fallbackContent={(
+                            <div style={{
+                                width: size, height: size, borderRadius: '50%',
+                                background: `linear-gradient(${ug(name)})`,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                color: '#fff', fontWeight: 800, fontSize: size * 0.35,
+                                fontFamily: "'Inter',sans-serif", letterSpacing: '0.02em',
+                                boxShadow: `0 2px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2)`,
+                            }}>{ini(name)}</div>
+                        )}
+                    />
+                </div>
+            ) : (
+                <div style={{
+                    width: size, height: size, borderRadius: '50%',
+                    background: `linear-gradient(${ug(name)})`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: '#fff', fontWeight: 800, fontSize: size * 0.35,
+                    fontFamily: "'Inter',sans-serif", letterSpacing: '0.02em',
+                    boxShadow: `0 2px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2)`,
+                }}>{ini(name)}</div>
+            )}
             {online && <span style={{
                 position: 'absolute', bottom: 1, right: 1,
                 width: size * 0.28, height: size * 0.28, borderRadius: '50%',
@@ -540,7 +576,7 @@ export function ChatPage() {
                                         onMouseEnter={e => (e.currentTarget.style.background = 'rgba(212,167,44,0.1)')}
                                         onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                                     >
-                                        <Av name={c.name} size={50} online={c.is_online === 1} />
+                                        <Av name={c.name} avatar_url={c.avatar_url} size={50} online={c.is_online === 1} />
                                         <div style={{ flex: 1, minWidth: 0 }}>
                                             <p style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '0.95rem', marginBottom: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.name}</p>
                                             {preview ? (
@@ -576,7 +612,7 @@ export function ChatPage() {
                                 >
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>
                                 </button>
-                                <Av name={selected.name} size={40} online={selected.is_online === 1} />
+                                <Av name={selected.name} avatar_url={selected.avatar_url} size={40} online={selected.is_online === 1} />
                                 <div style={{ flex: 1 }}>
                                     <p style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '0.97rem', marginBottom: 1 }}>{selected.name}</p>
                                     <p style={{ fontSize: '0.68rem', color: selected.is_online === 1 ? '#22c55e' : 'var(--text-secondary)' }}>
@@ -667,7 +703,7 @@ export function ChatPage() {
                                                                 minWidth: 120,
                                                                 textAlign: 'center' as const,
                                                             }}>
-                                                                <GiftVisual gift={{ name: gift.giftName, icon: gift.icon, image: gift.image ? resolveMediaUrl(gift.image) : null }} size={40} fontSize="2rem" />
+                                                                <GiftVisual gift={{ name: gift.giftName, icon: gift.icon, image: gift.image }} size={40} fontSize="2rem" />
                                                                 <p style={{ color: isMe ? '#1a1a1a' : 'var(--text-primary)', fontSize: '0.85rem', fontWeight: 700, margin: '0 0 2px' }}>
                                                                     {gift.giftName} Gift
                                                                 </p>

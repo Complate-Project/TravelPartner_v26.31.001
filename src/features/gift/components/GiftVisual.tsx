@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { MediaImage } from '../../../components/MediaImage';
 
 export interface GiftVisualInput {
     name: string;
@@ -21,20 +21,21 @@ export function GiftVisual({
     size?: number;
     fontSize?: string;
 }) {
-    const [failed, setFailed] = useState(false);
-    const url = gift.asset?.url || gift.image;
+    const rawUrl = gift.asset?.url || gift.image;
+    const fallback = <span style={{ fontSize, lineHeight: 1 }}>{gift.icon || '🎁'}</span>;
 
-    if (url && !failed) {
-        return (
-            <img
-                src={url}
-                alt={gift.name}
-                style={{ width: size, height: size, objectFit: 'contain' }}
-                onError={() => setFailed(true)}
-            />
-        );
+    if (!rawUrl) {
+        return fallback;
     }
-    return <span style={{ fontSize, lineHeight: 1 }}>{gift.icon || '🎁'}</span>;
+
+    return (
+        <MediaImage
+            src={rawUrl}
+            alt={gift.name}
+            style={{ width: size, height: size, objectFit: 'contain' }}
+            fallbackContent={fallback}
+        />
+    );
 }
 
 export default GiftVisual;

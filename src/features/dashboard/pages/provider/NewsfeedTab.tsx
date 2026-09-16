@@ -3,9 +3,7 @@ import { useParams } from 'react-router-dom';
 import type { Post, PostComment } from '../../../../utils/api';
 import { serviceApi, userApi } from '../../../../utils/api';
 import { Avatar } from './Avatar';
-import { API_ORIGIN } from '../../../../config/apiConfig';
-
-const BACKEND_ORIGIN = API_ORIGIN;
+import { MediaImage } from '../../../../components/MediaImage';
 
 // Production-safe share URL: the app's public origin (+ Vite base path if the
 // app is deployed under a subpath) + the current role's newsfeed route,
@@ -14,12 +12,6 @@ function buildShareUrl(role: string | undefined, postId: number) {
     const base = (import.meta.env.BASE_URL ?? '/').replace(/\/+$/, '');
     const rolePath = role || 'user';
     return `${window.location.origin}${base}/${rolePath}/dashboard/newsfeed#post-${postId}`;
-}
-
-function toFullUrl(url: string | null | undefined): string | null {
-    if (!url) return null;
-    if (url.startsWith('/uploads/')) return `${BACKEND_ORIGIN}${url}`;
-    return url;
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -147,7 +139,7 @@ function CommentItem({ comment }: { comment: PostComment }) {
             display: 'flex', gap: 10, padding: '10px 0',
             borderBottom: '1px solid var(--border-default)',
         }}>
-            <Avatar name={comment.author_name} size={30} />
+            <Avatar name={comment.author_name} avatar_url={comment.avatar_url} size={30} />
             <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 3 }}>
                     <span style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '0.82rem' }}>
@@ -389,7 +381,7 @@ function PostCard({
         }}>
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 16px 12px' }}>
-                <Avatar name={post.author_name} size={40} />
+                <Avatar name={post.author_name} avatar_url={post.author_avatar} size={40} />
                 <div style={{ flex: 1 }}>
                     <p style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '0.92rem', margin: 0 }}>
                         {post.author_name}
@@ -414,12 +406,15 @@ function PostCard({
                     {post.content}
                 </p>
                 {post.image_url && (
-                    <img src={toFullUrl(post.image_url) ?? undefined} alt="post"
+                    <MediaImage
+                        src={post.image_url}
+                        alt="post"
                         style={{
                             width: '100%', borderRadius: 10, display: 'block',
                             maxHeight: 320, objectFit: 'cover', marginTop: 12,
                             border: '1px solid var(--border-default)',
-                        }} />
+                        }}
+                    />
                 )}
             </div>
 
