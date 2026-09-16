@@ -604,9 +604,10 @@ router.get(
 );
 
 // ── GET /api/provider/featured-profiles ──────────────────────────────────────
-// Returns real member (user-role) profiles for the provider's "Featured Profiles"
-// section on the dashboard home. Excludes the requesting provider and any
-// admin accounts. Sorted by most recently created.
+// Returns active-membership user (user-role) profiles for the provider's
+// "Featured Profiles" section on the dashboard home. Only users with an active
+// membership are listed. Excludes the requesting provider and any admin accounts.
+// Sorted by most recently created.
 router.get(
     "/featured-profiles",
     authMiddleware,
@@ -619,6 +620,8 @@ router.get(
              WHERE role = 'user'
                AND id != ?
                AND is_active = 1
+               AND membership_package_id IS NOT NULL
+               AND (membership_expires_at IS NULL OR membership_expires_at >= NOW())
              ORDER BY created_at DESC
              LIMIT 12`,
             [providerId],
@@ -751,9 +754,11 @@ router.get(
 );
 
 // ── GET /api/provider/list ───────────────────────────────────────────────────
-// Returns all provider profiles (id, name, avatar_url, profession, location)
-// for the "Models" quick-link on the provider dashboard. Excludes the
-// requesting provider and any admin accounts.
+// Returns verified provider profiles (id, name, avatar_url, profession, location)
+// for the "Models" quick-link and Provider Directory on the provider dashboard.
+// Excludes the requesting provider and any admin accounts. Only membership-
+// holding providers are listed so the directory shows verified, upgraded
+// providers only.
 router.get(
     "/list",
     authMiddleware,
@@ -761,12 +766,43 @@ router.get(
     (req, res) => {
         const providerId = req.user.id;
         db.query(
-            `SELECT id, name, avatar_url, profession, location, interests
-             FROM users
-             WHERE role = 'provider'
-               AND id != ?
-               AND is_active = 1
-             ORDER BY created_at DESC
+            `SELECT u.id, u.name, u.avatar_url, u.profession, u.location, u.interests
+             FROM users u
+             WHERE u.role = 'provider'
+               AND u.id != ?
+               AND u.is_active = 1
+               AND u.membership_package_id IS NOT NULL
+               AND (u.membership_expires_at IS NULL OR u.membership_expires_at >= NOW())
+             ORDER BY u.created_at DESC
+             LIMIT 50`,
+            [providerId],
+            (err, rows) => {
+                if (err) return handleError(res, err);
+                res.json(rows || []);
+            }
+        );
+    }
+);
+
+// ── GET /api/provider/members ─────────────────────────────────────────────────
+// Returns active-membership users for the provider's "Members Directory" page.
+// Only users with an active (non-expired) membership are listed. Excludes the
+// requesting provider and any admin accounts. Sorted by most recently created.
+router.get(
+    "/members",
+    authMiddleware,
+    roleMiddleware(["provider", "admin"]),
+    (req, res) => {
+        const providerId = req.user.id;
+        db.query(
+            `SELECT u.id, u.name, u.avatar_url, u.profession, u.location, u.interests, u.date_of_birth
+             FROM users u
+             WHERE u.role = 'user'
+               AND u.id != ?
+               AND u.is_active = 1
+               AND u.membership_package_id IS NOT NULL
+               AND (u.membership_expires_at IS NULL OR u.membership_expires_at >= NOW())
+             ORDER BY u.created_at DESC
              LIMIT 50`,
             [providerId],
             (err, rows) => {

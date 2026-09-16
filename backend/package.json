@@ -4,8 +4,8 @@
   "description": "",
   "main": "src/server.js",
   "scripts": {
-    "start": "npm run migrate && node src/server.js",
-    "dev": "nodemon src/server.js",
+    "start": "node init && npm run migrate && node src/server.js",
+    "dev": "node init && nodemon src/server.js",
     "migrate": "node migrations/cli.js up",
     "migrate:down": "node migrations/cli.js down",
     "migrate:status": "node migrations/cli.js status",

@@ -307,6 +307,7 @@ export function DashboardHome() {
                     loading={profilesLoading}
                     isUser={isUserDashboard}
                     onSelect={handleSelectProfile}
+                    onShowMore={() => navigate(`/${role}/dashboard/providers`)}
                 />
 
 
